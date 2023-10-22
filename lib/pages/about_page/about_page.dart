@@ -45,7 +45,7 @@ class _AboutPageState extends State<AboutPage> {
                       image: AssetImage('assets/verify.png'), opacity: 0.1)),
             ),
             Padding(
-              padding: const EdgeInsets.all(28.0),
+              padding: const EdgeInsets.all(27.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.start,
