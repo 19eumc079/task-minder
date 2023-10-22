@@ -28,76 +28,57 @@ jobs:
           name: gitversion
           path: version.txt
   build:
+    name: Build APK and Create release
+    needs: [version]
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-
+      - uses: actions/checkout@v1
       - name: Get version.txt
-        run: |
-          curl -o version.txt -L "your-artifact-url-here" # Replace with the URL of your artifact
-          cat version.txt
-          echo "Version file retrieved."
-
-      - name: Set Version
-        id: set_version
-        run: |
-          VERSION=$(cat version.txt)
-          echo "::set-output name=version::$VERSION"
-        shell: bash
-
-      - name: Update Version in pubspec.yaml
-        run: |
-          sed -i "s/99.99.99+99/${{ steps.set_version.outputs.version }}+${{ github.run_number }}/g" pubspec.yaml
-        shell: bash
+        uses: actions/download-artifact@v2
+        with:
+          name: gitversion
+      - name: Create new file without newline char from version.txt
+        run: tr -d '\n' < version.txt > version1.txt
+      - name: Read version
+        id: version
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: version1.txt
+    - name: Update version in pubspec.yaml
+      run: |
+        sed -i "s/99.99.99+99/${{ steps.set_version.outputs.version }}+${{ github.run_number }}/g" pubspec.yaml
+      shell: bash
 
       - name: Update KeyStore Password
-        run: |
-          echo "KEYSTORE_PASS=${{ secrets.KEYSTORE_PASS }}" >> $GITHUB_ENV
-          sed -i 's/#{KEYSTORE_PASS}#/$KEYSTORE_PASS/g' android/key.properties
-        shell: bash
+      run: |
+        echo "KEYSTORE_PASS=${{ secrets.KEYSTORE_PASS }}" >> $GITHUB_ENV
+        sed -i 's/#{KEYSTORE_PASS}#/$KEYSTORE_PASS/g' android/key.properties
+      shell: bash
 
       - name: Update KeyStore Key Password
-        run: |
-          echo "KEYSTORE_KEY_PASS=${{ secrets.KEYSTORE_KEY_PASS }}" >> $GITHUB_ENV
-          sed -i 's/#{KEYSTORE_KEY_PASS}#/$KEYSTORE_KEY_PASS/g' android/key.properties
-        shell: bash
+      run: |
+        echo "KEYSTORE_KEY_PASS=${{ secrets.KEYSTORE_KEY_PASS }}" >> $GITHUB_ENV
+        sed -i 's/#{KEYSTORE_KEY_PASS}#/$KEYSTORE_KEY_PASS/g' android/key.properties
+      shell: bash
 
-      - name: Set up Java
-        uses: actions/setup-java@v2
+      - uses: actions/setup-java@v1
         with:
-          java-version: 12.x # Change to your desired Java version
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v4
+          java-version: "12.x"
+      - uses: subosito/flutter-action@v1
         with:
-          flutter-version: beta
-
-      - name: Flutter Clean
-        run: flutter clean
-
-      - name: Flutter Pub Get
-        run: flutter pub get
-
-      - name: Build APK
-        run: flutter build apk --release --split-per-abi
-
-      - name: Build App Bundle
-        run: flutter build appbundle --release
-
-      - name: Create GitHub Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
+          channel: "beta"
+      - run: flutter clean
+      - run: flutter pub get
+      - run: flutter build apk --release --split-per-abi
+      - run: flutter build appbundle --release
+      - name: Create a Release in GitHub
+        uses: ncipollo/release-action@v1
         with:
-          files: |
-            build/app/outputs/apk/release/*.apk
-            build/app/outputs/bundle/release/app-release.aab
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag_name: ${{ steps.set_version.outputs.version }}
-          title: Release ${{ steps.set_version.outputs.version }}
-
-      - name: Upload App Bundle
+          artifacts: "build/app/outputs/apk/release/*.apk,build/app/outputs/bundle/release/app-release.aab"
+          token: ${{ secrets.GH_TOKEN }}
+          tag: ${{ steps.version.outputs.content }}
+          commit: ${{ github.sha }}
+      - name: Upload app bundle
         uses: actions/upload-artifact@v2
         with:
           name: appbundle
