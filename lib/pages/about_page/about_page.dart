@@ -72,7 +72,7 @@ class _AboutPageState extends State<AboutPage> {
                   ),
                   const SizedBox(height: 24),
                   const Text(
-                    'Welcome to My App!',
+                    'Welcome to Task Minder!',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
