@@ -1,9 +1,9 @@
-# name: task-minder
+name: task-minder
 
-# on:
-#   push:
-#     branches:
-#       - set-pipeline
+on:
+  push:
+    branches:
+      - set-pipeline
 
 # jobs:
 #   version:
