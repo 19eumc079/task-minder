@@ -44,23 +44,12 @@ jobs:
         uses: juliangruber/read-file-action@v1
         with:
           path: version1.txt
-    - name: Update version in pubspec.yaml
-      run: |
-        sed -i "s/99.99.99+99/${{ steps.set_version.outputs.version }}+${{ github.run_number }}/g" pubspec.yaml
-      shell: bash
-
-      - name: Update KeyStore Password
-      run: |
-        echo "KEYSTORE_PASS=${{ secrets.KEYSTORE_PASS }}" >> $GITHUB_ENV
-        sed -i 's/#{KEYSTORE_PASS}#/$KEYSTORE_PASS/g' android/key.properties
-      shell: bash
-
-      - name: Update KeyStore Key Password
-      run: |
-        echo "KEYSTORE_KEY_PASS=${{ secrets.KEYSTORE_KEY_PASS }}" >> $GITHUB_ENV
-        sed -i 's/#{KEYSTORE_KEY_PASS}#/$KEYSTORE_KEY_PASS/g' android/key.properties
-      shell: bash
-
+      # - name: Update version in YAML
+      #   run: sed -i 's/99.99.99+99/${{ steps.version.outputs.content }}+${{ github.run_number }}/g' pubspec.yaml
+      # - name: Update KeyStore password in gradle properties
+      #   run: sed -i 's/#{KEYSTORE_PASS}#/${{ secrets.KEYSTORE_PASS }}/g' android/key.properties
+      # - name: Update KeyStore key password in gradle properties
+      #   run: sed -i 's/#{KEYSTORE_KEY_PASS}#/${{ secrets.KEYSTORE_KEY_PASS }}/g' android/key.properties
       - uses: actions/setup-java@v1
         with:
           java-version: "12.x"
