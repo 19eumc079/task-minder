@@ -1,44 +1,67 @@
 on:
   push:
     branches:
-      - set-pipeline #define which branch you want to use to trigger the action
+      - set-pipeline
 
 name: task-minder
 
 jobs:
-  build:
-    name: Build APK and Create release
-    needs: [version]
+  prepare:
+    name: Prepare Environment
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+  build:
+    name: Build APK and Create Release
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
       - name: Get version.txt
         uses: actions/download-artifact@v2
         with:
           name: gitversion
+
       - name: Create new file without newline char from version.txt
-        run: tr -d '\n' < version.txt > version1.txt
+        run: |
+          tr -d '\n' < version.txt > version1.txt
+
       - name: Read version
         id: version
         uses: juliangruber/read-file-action@v1
         with:
           path: version1.txt
+
       - name: Update version in YAML
-        run: sed -i 's/99.99.99+99/${{ steps.version.outputs.content }}+${{ github.run_number }}/g' pubspec.yaml
+        run: |
+          sed -i "s/99.99.99+99/${{ steps.version.outputs.content }}+${{ github.run_number }}/g" pubspec.yaml
+
       - name: Update KeyStore password in gradle properties
-        run: sed -i 's/#{KEYSTORE_PASS}#/${{ secrets.KEYSTORE_PASS }}/g' android/key.properties
+        run: |
+          sed -i "s/#{KEYSTORE_PASS}#/${{ secrets.KEYSTORE_PASS }}/g" android/key.properties
+
       - name: Update KeyStore key password in gradle properties
-        run: sed -i 's/#{KEYSTORE_KEY_PASS}#/${{ secrets.KEYSTORE_KEY_PASS }}/g' android/key.properties
-      - uses: actions/setup-java@v1
+        run: |
+          sed -i "s/#{KEYSTORE_KEY_PASS}#/${{ secrets.KEYSTORE_KEY_PASS }}/g" android/key.properties
+
+      - name: Set up Java
+        uses: actions/setup-java@v2
         with:
-          java-version: "12.x"
-      - uses: subosito/flutter-action@v1
+          java-version: 12.x
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v3
         with:
-          channel: "beta"
-      - run: flutter clean
-      - run: flutter pub get
-      - run: flutter build apk --release --split-per-abi
-      - run: flutter build appbundle --release
+          flutter-version: "2.x"
+
+      - name: Build APK and App Bundle
+        run: |
+          flutter clean
+          flutter pub get
+          flutter build apk --release --split-per-abi
+          flutter build appbundle --release
+
       - name: Create a Release in GitHub
         uses: ncipollo/release-action@v1
         with:
@@ -46,6 +69,7 @@ jobs:
           token: ${{ secrets.TOKEN }}
           tag: ${{ steps.version.outputs.content }}
           commit: ${{ github.sha }}
+
       - name: Upload app bundle
         uses: actions/upload-artifact@v2
         with:
