@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - set-pipeline #define which branch you want to use to trigger the action
+      - main #define which branch you want to use to trigger the action
 
 name: task-minder
 
