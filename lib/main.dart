@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:task_minder/pages/todo_page/todo_page.dart';
+import 'package:task_minder/pages/pages.dart';
 
 void main() async {
   await Hive.initFlutter();
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         useMaterial3: true,
       ),
-      home: const ToDoPage(),
+      home: const HomePage(),
     );
   }
 }

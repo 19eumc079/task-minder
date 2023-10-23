@@ -34,7 +34,7 @@ class _AboutPageState extends State<AboutPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('About My App'),
+        title: const Text('About'),
       ),
       body: Center(
         child: Stack(
@@ -65,19 +65,19 @@ class _AboutPageState extends State<AboutPage> {
                     'Version: $version',
                     style: const TextStyle(fontSize: 16),
                   ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Build Number: $buildNumber',
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(height: 24),
+                  // const SizedBox(height: 12),
+                  // Text(
+                  //   'Build Number: $buildNumber',
+                  //   style: const TextStyle(fontSize: 16),
+                  // ),
+                  const SizedBox(height: 10),
                   const Text(
                     'Welcome to Task Minder!',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
                   const Text(
-                    'My App is a todo list application built with Flutter. It allows you to organize your tasks and manage your daily activities efficiently.',
+                    'App is a todo list application built with Flutter. It allows you to organize your tasks and manage your daily activities efficiently.',
                     style: TextStyle(fontSize: 16),
                     textAlign: TextAlign.center,
                   ),
