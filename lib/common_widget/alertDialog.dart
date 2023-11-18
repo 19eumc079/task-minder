@@ -16,7 +16,7 @@ class AlertDialogMethod {
           content: const SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text('Would you like to delete of this  ToDo\'s?'),
+                Text('Would you like to delete of this Item\'s?'),
               ],
             ),
           ),

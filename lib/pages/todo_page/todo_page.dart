@@ -3,10 +3,9 @@ import 'package:hive/hive.dart';
 
 import '../../common_widget/common_widget.dart';
 import '../../services/services.dart';
-import '../pages.dart';
 
 class ToDoPage extends StatefulWidget {
-  const ToDoPage({Key? key});
+  const ToDoPage({super.key});
 
   @override
   State<ToDoPage> createState() => _ToDoPageState();
@@ -16,7 +15,7 @@ class _ToDoPageState extends State<ToDoPage> {
   TextEditingController contentController = TextEditingController();
   final ScrollController _controller = ScrollController();
   final todoBox = Hive.box('toDOListBox');
-  List todoList = [];
+  List<dynamic> todoList = [];
   bool isButton = false;
 
   @override
@@ -26,10 +25,10 @@ class _ToDoPageState extends State<ToDoPage> {
     updateToDoList();
   }
 
-  void updateToDoList() {
+  Future<void> updateToDoList() async {
+    final updatedTodoList = await todoBox.get('toDos') ?? [];
     setState(() {
-      todoList = todoBox.get('toDos') ?? [];
-      todoList.sort((a, b) => a['date'].compareTo(b['date']));
+      todoList = updatedTodoList;
     });
   }
 
@@ -52,6 +51,7 @@ class _ToDoPageState extends State<ToDoPage> {
       child: Scaffold(
         backgroundColor: const Color.fromRGBO(19, 24, 38, 1),
         appBar: AppBar(
+          iconTheme: const IconThemeData(color: Colors.white),
           backgroundColor: Colors.black,
           title: const Text(
             'Todo List',
@@ -61,17 +61,6 @@ class _ToDoPageState extends State<ToDoPage> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.info),
-              onPressed: () async {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AboutPage()),
-                );
-              },
-            )
-          ],
         ),
         body: Column(
           children: [
@@ -177,8 +166,7 @@ class _ToDoPageState extends State<ToDoPage> {
                                       setState(() {
                                         Database().update(index, {
                                           'content': todoList[index]['content'],
-                                          'date': CommonMethod().formatDate(
-                                              DateTime.now(), 'MMM d, y'),
+                                          'date': todoList[index]['date'],
                                           'done': value
                                         });
                                       });
@@ -219,7 +207,7 @@ class _ToDoPageState extends State<ToDoPage> {
                       controller: contentController,
                       textCapitalization: TextCapitalization.sentences,
                       decoration: InputDecoration(
-                        hintText: "Add your toDo\'s ....",
+                        hintText: "Add your toDo's ....",
                         hintStyle: const TextStyle(color: Colors.grey),
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 10,
