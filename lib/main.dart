@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:task_minder/models/expense_tracker_model.dart';
 import 'package:task_minder/pages/pages.dart';
 
 void main() async {
   await Hive.initFlutter();
+  Hive.registerAdapter(ExpenseTrackerModelAdapter());
   await Hive.openBox('toDOListBox');
+  await Hive.openBox('expenseTrackerBox');
 
   runApp(const MyApp());
 }

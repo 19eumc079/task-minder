@@ -166,8 +166,7 @@ class _ToDoPageState extends State<ToDoPage> {
                                       setState(() {
                                         Database().update(index, {
                                           'content': todoList[index]['content'],
-                                          'date': CommonMethod().formatDate(
-                                              DateTime.now(), 'MMM d, y'),
+                                          'date': todoList[index]['date'],
                                           'done': value
                                         });
                                       });
